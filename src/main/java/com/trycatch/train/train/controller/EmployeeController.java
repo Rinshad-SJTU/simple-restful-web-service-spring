@@ -1,6 +1,5 @@
 package com.trycatch.train.train.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trycatch.train.train.model.Employee;
 import com.trycatch.train.train.model.Response;
 import com.trycatch.train.train.repository.EmployeeRepository;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +45,7 @@ public class EmployeeController {
         return new Response(200, "Success");
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public Response updateEmployee(@RequestBody Employee emp) {
         Employee employee = repository.getOne(emp.getId());
         if (emp.getName() != null) {
@@ -60,10 +58,13 @@ public class EmployeeController {
         return new Response(200, "Success");
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public Response deleteEmployee(@RequestParam long id) {
-        repository.deleteById(id);
-        return new Response(200, "Success");
+        Optional<Employee> employee = repository.findById(id);
+        if (employee.isPresent()) {
+            repository.deleteById(id);
+            return new Response(200, "Success");
+        } else return new Response(404, "No employee with ID " + id + " found");
     }
 
 }
